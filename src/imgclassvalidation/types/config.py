@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -62,8 +62,8 @@ class EvalConfig:
     device: torch.device
     amp: bool = False
     non_blocking: bool = True
-    topk: Tuple[int, ...] = (1, 5)
-    criterion: Optional[nn.Module] = None
+    topk: tuple[int, ...] = (1, 5)
+    criterion: nn.Module | None = None
 
 
 @dataclass
@@ -105,5 +105,5 @@ class EvalResult:
             are enabled, and new keys may be added without breaking the API.
     """
 
-    metrics: Dict[str, float]
-    extras: Dict[str, Any]
+    metrics: dict[str, float]
+    extras: dict[str, Any]

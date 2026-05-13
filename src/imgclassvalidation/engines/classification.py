@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Tuple
+from collections.abc import Callable
 
 import torch
 import torch.nn as nn
@@ -7,8 +7,8 @@ from ignite.engine import Engine, Events
 from ignite.metrics import Accuracy, Loss, TopKCategoricalAccuracy
 from torch.utils.data import DataLoader
 
-from ImgClassValidation.extras import count_params, fvcore_flops
-from ImgClassValidation.types import EvalConfig, EvalResult
+from imgclassvalidation.extras import count_params, fvcore_flops
+from imgclassvalidation.types import EvalConfig, EvalResult
 
 
 def _default_criterion():
@@ -23,9 +23,8 @@ def create_classification_evaluator(
     dataloader: DataLoader,
     config: EvalConfig,
     *,
-    output_transform: Optional[
-        Callable[[torch.Tensor, torch.Tensor], Tuple[torch.Tensor, torch.Tensor]]
-    ] = None,
+    output_transform: Callable[[torch.Tensor, torch.Tensor], tuple[torch.Tensor, torch.Tensor]]
+    | None = None,
 ) -> Engine:
     """
     Ignite evaluator (classification).
@@ -39,11 +38,9 @@ def create_classification_evaluator(
     """
 
     device = config.device
-    criterion = (
-        config.criterion if config.criterion is not None else _default_criterion()
-    )
+    criterion = config.criterion if config.criterion is not None else _default_criterion()
 
-    def _inference(engine: Engine, batch: Tuple[torch.Tensor, torch.Tensor]):
+    def _inference(engine: Engine, batch: tuple[torch.Tensor, torch.Tensor]):
         model.eval()
         x, y = batch
         x = x.to(device, non_blocking=config.non_blocking)
@@ -60,32 +57,27 @@ def create_classification_evaluator(
     evaluator = Engine(_inference)
 
     # --- metrics ---
-    Loss(criterion, output_transform=lambda out: (out[0], out[1])).attach(
-        evaluator, "loss"
-    )
+    Loss(criterion, output_transform=lambda out: (out[0], out[1])).attach(evaluator, "loss")
 
     if 1 in config.topk:
-        Accuracy(output_transform=lambda out: (out[0], out[1])).attach(
-            evaluator, "acc1"
-        )
+        Accuracy(output_transform=lambda out: (out[0], out[1])).attach(evaluator, "acc1")
     for k in config.topk:
         if k != 1:
-            TopKCategoricalAccuracy(
-                k=k, output_transform=lambda out: (out[0], out[1])
-            ).attach(evaluator, f"acc{k}")
+            TopKCategoricalAccuracy(k=k, output_transform=lambda out: (out[0], out[1])).attach(
+                evaluator, f"acc{k}"
+            )
 
     # --- extras: store once at STARTED ---
-    evaluator.state.extras = {}  # type: ignore[attr-defined]
+    evaluator.state.extras = {}  # ty: ignore[unresolved-attribute]
 
     @evaluator.on(Events.STARTED)
     def _on_started(engine: Engine):
-        engine.state.extras.update(count_params(model))  # type: ignore[attr-defined]
-
+        engine.state.extras.update(count_params(model))  # ty: ignore[unresolved-attribute]
         # ImageNet1k前提: 大規模データでもFLOPsは1回だけ推定する
         # example_input は loader先頭から1枚取る（ユーザーが明示入力を渡す拡張も後で可能）
         x0, _ = next(iter(dataloader))
         example = x0[:1].contiguous()
-        engine.state.extras.update(fvcore_flops(model, example, device))  # type: ignore[attr-defined]
+        engine.state.extras.update(fvcore_flops(model, example, device))  # ty: ignore[unresolved-attribute]
 
     return evaluator
 
@@ -99,11 +91,10 @@ def evaluate_classification(
     dataloader: DataLoader,
     config: EvalConfig,
     *,
-    output_transform: Optional[
-        Callable[[torch.Tensor, torch.Tensor], Tuple[torch.Tensor, torch.Tensor]]
-    ] = None,
+    output_transform: Callable[[torch.Tensor, torch.Tensor], tuple[torch.Tensor, torch.Tensor]]
+    | None = None,
     progress: bool = True,
-    progress_metrics: Tuple[str, ...] = ("loss", "acc1", "acc5"),
+    progress_metrics: tuple[str, ...] = ("loss", "acc1", "acc5"),
 ) -> EvalResult:
     """
     Run classification model evaluation using an Ignite-based evaluator.

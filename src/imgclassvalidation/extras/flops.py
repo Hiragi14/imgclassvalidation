@@ -1,5 +1,3 @@
-from typing import Dict, Optional
-
 import torch
 import torch.nn as nn
 from fvcore.nn import FlopCountAnalysis
@@ -8,7 +6,7 @@ from fvcore.nn import FlopCountAnalysis
 @torch.no_grad()
 def fvcore_flops(
     model: nn.Module, example_input: torch.Tensor, device: torch.device
-) -> Dict[str, Optional[float]]:
+) -> dict[str, float | None | str]:
     if FlopCountAnalysis is None:
         return {"fvcore_flops_total": None, "fvcore_error": "fvcore_not_installed"}
 

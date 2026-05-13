@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torchvision import datasets, transforms, models
+from torchvision import datasets, models, transforms
 
-from ImgClassValidation.types import EvalConfig
-from ImgClassValidation.engines import evaluate_classification  # ← あなたの関数の配置に合わせて変更
+from imgclassvalidation.engines import evaluate_classification  # ← あなたの関数の配置に合わせて変更
+from imgclassvalidation.types import EvalConfig
 
 
 def main():
@@ -37,14 +37,16 @@ def main():
         ]
     )
 
-    test_ds = datasets.CIFAR10(root="/DeepLearning/Dataset/torchvision/CIFAR10", train=False, download=True, transform=tfm)
+    test_ds = datasets.CIFAR10(
+        root="/DeepLearning/Dataset/torchvision/CIFAR10", train=False, download=True, transform=tfm
+    )
     test_loader = DataLoader(
         test_ds,
         batch_size=128,
-        shuffle=False,           # 評価なので基本False
+        shuffle=False,  # 評価なので基本False
         num_workers=8,
         pin_memory=(device.type == "cuda"),
-        persistent_workers=True, # 大規模評価寄り（環境によりFalseでも可）
+        persistent_workers=True,  # 大規模評価寄り（環境によりFalseでも可）
     )
 
     # -------------------------
