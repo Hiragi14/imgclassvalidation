@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, models, transforms
 
-from imgclassvalidation.engines import evaluate_classification  # ← あなたの関数の配置に合わせて変更
+from imgclassvalidation.engines import evaluate_classification
 from imgclassvalidation.types import EvalConfig
 
 
@@ -46,7 +46,7 @@ def main():
         shuffle=False,  # 評価なので基本False
         num_workers=8,
         pin_memory=(device.type == "cuda"),
-        persistent_workers=True,  # 大規模評価寄り（環境によりFalseでも可）
+        persistent_workers=True,
     )
 
     # -------------------------
@@ -63,7 +63,7 @@ def main():
         model=model,
         dataloader=test_loader,
         config=config,
-        # output_transform=None,  # 通常は不要（logits, yがそのまま）
+        # output_transform=None,
     )
 
     # -------------------------
