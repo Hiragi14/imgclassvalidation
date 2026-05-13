@@ -1,4 +1,3 @@
-# GreedyNeuronPruning
 <p align="center">
   <img src=assets/logo.png width="420"/>
 </p>
@@ -26,31 +25,6 @@
   <img src="https://img.shields.io/badge/Pruning-Greedy%20Baseline-orange" />
   <img src="https://img.shields.io/badge/MLP-Neuron%20Level-red" />
 </p>
-
-ImgClassValidation は、画像分類モデルを対象とした
-評価専用の軽量・拡張可能な PyTorch ライブラリです。
-
-特に以下の用途を想定しています。
-
-- ImageNet1k クラスの大規模評価
-- プルーニング後・構造変更後のモデル評価
-- 精度と計算量（MACs / FLOPs）を同時に比較したい研究用途
-
-PyTorch-Ignite を内部実装として利用していますが、
-API からは完全に隠蔽されています。
-
-
-
----
-
-了解しました。原因も把握しました。
-**対処方針：この出力には一切 ```（コードフェンス）を使いません。**
-コード例は **4スペースインデントの Markdown 標準コードブロック**で書きます。
-これなら **GitHub / Web / コピペ**すべてで崩れません。
-
-以下は **README.md にそのまま全文コピペできる日本語版**です。
-
----
 
 # ImgClassValidation
 
@@ -220,7 +194,7 @@ extras（補助情報）：
 
 ```bash
 git clone url_to_repository
-cd GreedyNeuronPruning
+cd ImgClassValidation
 ```
 
 **2. Sync environment**
