@@ -63,6 +63,7 @@ def main():
         model=model,
         dataloader=test_loader,
         config=config,
+        # progress=False,
         # output_transform=None,
     )
 

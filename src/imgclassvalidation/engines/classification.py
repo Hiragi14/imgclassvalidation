@@ -8,6 +8,7 @@ from ignite.metrics import Accuracy, Loss, TopKCategoricalAccuracy
 from torch.utils.data import DataLoader
 
 from imgclassvalidation.extras import count_params, fvcore_flops
+from imgclassvalidation.hooks import attach_rich_progress
 from imgclassvalidation.types import EvalConfig, EvalResult
 
 
@@ -94,6 +95,7 @@ def evaluate_classification(
     output_transform: Callable[[torch.Tensor, torch.Tensor], tuple[torch.Tensor, torch.Tensor]]
     | None = None,
     progress: bool = True,
+    progress_type: str = "rich",
     progress_metrics: tuple[str, ...] = ("loss", "acc1", "acc5"),
 ) -> EvalResult:
     """
@@ -177,10 +179,17 @@ def evaluate_classification(
     )
 
     if progress:
-        ProgressBar(persist=True).attach(
-            evaluator,
-            metric_names=list(progress_metrics),
-        )
+        if progress_type == "rich":
+            attach_rich_progress(
+                evaluator,
+                total=len(dataloader),
+                description="Evaluating",
+            )
+        else:
+            ProgressBar(persist=True).attach(
+                evaluator,
+                metric_names=list(progress_metrics),
+            )
 
     evaluator.run(dataloader)
 
