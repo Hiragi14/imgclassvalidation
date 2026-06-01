@@ -10,7 +10,7 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 
-console = Console()
+console_ = Console()
 
 
 def attach_rich_progress(
@@ -18,6 +18,7 @@ def attach_rich_progress(
     *,
     total: int,
     description: str = "Training",
+    console: Console = console_,
 ):
     progress = Progress(
         SpinnerColumn(),
