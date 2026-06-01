@@ -28,7 +28,7 @@ def attach_rich_progress(
         TimeElapsedColumn(),
         TimeRemainingColumn(),
         console=console,
-        transient=False,
+        transient=True,
         refresh_per_second=5,
     )
 
