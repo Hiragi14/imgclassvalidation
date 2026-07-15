@@ -8,7 +8,7 @@ from ignite.metrics import Accuracy, Loss, TopKCategoricalAccuracy
 from rich.console import Console
 from torch.utils.data import DataLoader
 
-from imgclassvalidation.extras import count_params, fvcore_flops
+from imgclassvalidation.extras import count_params, fvcore_flops, measure_cuda_latency
 from imgclassvalidation.hooks import attach_rich_progress
 from imgclassvalidation.types import EvalConfig, EvalResult
 
@@ -82,6 +82,8 @@ def create_classification_evaluator(
         x0, _ = next(iter(dataloader))
         example = x0[:1].contiguous()
         engine.state.extras.update(fvcore_flops(model, example, device))  # ty: ignore[unresolved-attribute]
+        # Measure latency
+        engine.state.extras.update(measure_cuda_latency(model, example, device))  # ty: ignore[unresolved-attribute]
 
     return evaluator
 
