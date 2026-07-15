@@ -5,11 +5,14 @@ import torch.nn as nn
 from ignite.contrib.handlers.tqdm_logger import ProgressBar
 from ignite.engine import Engine, Events
 from ignite.metrics import Accuracy, Loss, TopKCategoricalAccuracy
+from rich.console import Console
 from torch.utils.data import DataLoader
 
-from imgclassvalidation.extras import count_params, fvcore_flops
+from imgclassvalidation.extras import count_params, fvcore_flops, measure_cuda_latency
 from imgclassvalidation.hooks import attach_rich_progress
 from imgclassvalidation.types import EvalConfig, EvalResult
+
+console_ = Console()
 
 
 def _default_criterion():
@@ -79,6 +82,8 @@ def create_classification_evaluator(
         x0, _ = next(iter(dataloader))
         example = x0[:1].contiguous()
         engine.state.extras.update(fvcore_flops(model, example, device))  # ty: ignore[unresolved-attribute]
+        # Measure latency
+        engine.state.extras.update(measure_cuda_latency(model, example, device))  # ty: ignore[unresolved-attribute]
 
     return evaluator
 
@@ -97,6 +102,7 @@ def evaluate_classification(
     progress: bool = True,
     progress_type: str = "rich",
     progress_metrics: tuple[str, ...] = ("loss", "acc1", "acc5"),
+    console: Console = console_,
 ) -> EvalResult:
     """
     Run classification model evaluation using an Ignite-based evaluator.
@@ -184,6 +190,7 @@ def evaluate_classification(
                 evaluator,
                 total=len(dataloader),
                 description="Evaluating",
+                console=console,
             )
         else:
             ProgressBar(persist=True).attach(
